@@ -17,5 +17,15 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+public slots:
+    void preparationTimerFinished();
+    void breakSessionFinished();
+    void workSessionFinished();
+
+signals:
+    void startPreparationTimer();
+    void startBreakSession();
+    void startWorkSession();
 };
 #endif // MAINWINDOW_H

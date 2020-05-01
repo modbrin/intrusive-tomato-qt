@@ -4,6 +4,8 @@
 #include <windef.h>
 #pragma once
 
+// taken from (Windows 10 Aero Undocumented API) https://gist.github.com/ysc3839/b08d2bff1c7dacde529bed1d37e85ccf
+
 typedef enum _WINDOWCOMPOSITIONATTRIB
 {
     WCA_UNDEFINED = 0,

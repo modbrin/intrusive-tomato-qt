@@ -20,6 +20,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     notificationwindow.cpp \
+    timerwindow.cpp \
     utils.cpp
 
 HEADERS += \
@@ -27,6 +28,7 @@ HEADERS += \
     fullscreentimer.h \
     mainwindow.h \
     notificationwindow.h \
+    timerwindow.h \
     utils.h
 
 FORMS += \

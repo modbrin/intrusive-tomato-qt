@@ -5,41 +5,39 @@
 #include <QPropertyAnimation>
 #include <QTimer>
 
-FullscreenTimer::FullscreenTimer(QWidget *parent) :
-    QWidget(parent),
+FullscreenTimer::FullscreenTimer(int msec, int updateInterval, QWidget *parent) :
+    TimerWindow(msec, updateInterval, parent),
     ui(new Ui::FullscreenTimer)
 {
     ui->setupUi(this);
 
+    // setup window
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::SubWindow);
-    setStyleSheet("background-color:transparent;");
+    setStyleSheet("background-color:rgba( 0, 0, 0, 50% );");
     enableWindowBackgroundBlur(this);
+    setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     QTimer::singleShot(0, this, SLOT(showFullScreen()));
+    setAttribute(Qt::WA_DeleteOnClose, true); // when closed window will deallocate its memory
+    setProperty("windowOpacity", 0); // start invisible
 
-    fadeIn();
+    // edittext style setter
+    auto setupTextStyle = [](QLineEdit* et) {
+        et->setStyleSheet("color: white; background-color:transparent;");
+        et->setEnabled(false);
+    };
+
+    setupTextStyle(ui->timeField);
+    updateCountdownDisplay(msec);
 }
 
-void FullscreenTimer::fadeIn()
+void FullscreenTimer::updateCountdownDisplay(int msec)
 {
-    QPropertyAnimation *anim = new QPropertyAnimation(this, "windowOpacity");
-    anim->setDuration(700);
-    anim->setStartValue(0);
-    anim->setEndValue(1);
-    anim->setEasingCurve(QEasingCurve::InBack);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
-}
+    QTime time(0,0,0);
+    time = time.addMSecs(msec);
 
-void FullscreenTimer::fadeOut()
-{
-
-    QPropertyAnimation *anim = new QPropertyAnimation(this, "windowOpacity");
-    anim->setDuration(500);
-    anim->setStartValue(1);
-    anim->setEndValue(0);
-    anim->setEasingCurve(QEasingCurve::OutBack);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
-    //connect(anim, SIGNAL(finished()), this, SLOT(hideThisWidget()));
-    // custom close action
+    ui->timeField->setText(QString::number(time.minute()).rightJustified(2,'0')
+                           + ":"
+                           + QString::number(time.second()).rightJustified(2, '0'));
 }
 
 FullscreenTimer::~FullscreenTimer()

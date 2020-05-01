@@ -35,12 +35,3 @@ void enableWindowBackgroundBlur(QWidget* w)
     #endif // Q_OS_WIN
 }
 
-void normalizeSizeAndCenter(QTextEdit* te)
-{
-    te->setAlignment(Qt::AlignCenter);
-    QFontMetrics m (te->font());
-    int RowHeight = m.lineSpacing();
-    te->setFixedHeight(RowHeight);
-    te->setEnabled(false);
-}
-

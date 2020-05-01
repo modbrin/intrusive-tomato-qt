@@ -1,11 +1,9 @@
-#ifndef ACRYLIC_EFFECTS_H
-#define ACRYLIC_EFFECTS_H
+#ifndef QTOMATO_UTILS_H
+#define QTOMATO_UTILS_H
 
 #include <QWidget>
-#include <QTextEdit>
+#include <QLineEdit>
 
 void enableWindowBackgroundBlur(QWidget* w);
 
-void normalizeSizeAndCenter(QTextEdit* te);
-
-#endif // ACRYLIC_EFFECTS_H
+#endif // QTOMATO_UTILS_H
