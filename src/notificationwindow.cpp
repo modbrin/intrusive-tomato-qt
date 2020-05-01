@@ -47,9 +47,18 @@ void NotificationWindow::updateCountdownDisplay(int msec)
     QTime time(0,0,0);
     time = time.addMSecs(msec);
 
-    ui->timeField->setText(QString::number(time.minute()).rightJustified(2,'0')
+    ui->timeField->setText(QString::number(time.minute()).rightJustified(2, '0')
                            + ":"
                            + QString::number(time.second()).rightJustified(2, '0'));
+}
+
+void NotificationWindow::mousePressEvent(QMouseEvent *event) {
+    m_nMouseClick_X_Coordinate = event->x();
+    m_nMouseClick_Y_Coordinate = event->y();
+}
+
+void NotificationWindow::mouseMoveEvent(QMouseEvent *event) {
+    move(event->globalX() - m_nMouseClick_X_Coordinate, event->globalY() - m_nMouseClick_Y_Coordinate);
 }
 
 NotificationWindow::~NotificationWindow()

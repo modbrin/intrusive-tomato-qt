@@ -16,27 +16,32 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    fullscreentimer.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    notificationwindow.cpp \
-    timerwindow.cpp \
-    utils.cpp
+    src/fullscreentimer.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/notificationwindow.cpp \
+    src/timerwindow.cpp \
+    src/utils.cpp
 
 HEADERS += \
-    compositor_defines.h \
-    fullscreentimer.h \
-    mainwindow.h \
-    notificationwindow.h \
-    timerwindow.h \
-    utils.h
+    src/compositor_defines.h \
+    src/fullscreentimer.h \
+    src/mainwindow.h \
+    src/notificationwindow.h \
+    src/timerwindow.h \
+    src/utils.h
 
 FORMS += \
-    fullscreentimer.ui \
-    mainwindow.ui \
-    notificationwindow.ui
+    ui/fullscreentimer.ui \
+    ui/mainwindow.ui \
+    ui/notificationwindow.ui
+
+RC_ICONS = icon.ico
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    res.qrc
