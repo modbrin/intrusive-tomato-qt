@@ -2,4 +2,7 @@
     <qresource prefix="/images">
         <file>icon.ico</file>
     </qresource>
+    <qresource prefix="/fonts">
+        <file>misc/OpenSans.ttf</file>
+    </qresource>
 </RCC>

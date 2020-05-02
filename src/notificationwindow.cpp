@@ -18,7 +18,6 @@ NotificationWindow::NotificationWindow(QString message, int msec, int updateInte
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::SubWindow);
     setStyleSheet("background-color:rgba( 255, 81, 0, 30% );");
     enableWindowBackgroundBlur(this);
-    //setSizePolicy(QSizePolicy(QSizePolicy::, QSizePolicy::Fixed));
     setAttribute(Qt::WA_DeleteOnClose, true); // when closed window will deallocate its memory
     setProperty("windowOpacity", 0); // start invisible
 

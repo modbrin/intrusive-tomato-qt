@@ -7,13 +7,29 @@
 #include <string>
 #include <chrono>
 
-TimerWindow::TimerWindow(int msec, int updateInterval, QWidget *parent) :
+TimerWindow::TimerWindow(int updateInterval, QWidget *parent) :
     QWidget(parent),
-    msecTimer(msec),
     msecUpdateInterval(updateInterval)
 {
     connect(&ticker, SIGNAL(timeout()), this, SLOT(timerTick()));
     connect(&timer, SIGNAL(timeout()), this, SLOT(timerFinished()));
+}
+
+TimerWindow::TimerWindow(int msec, int updateInterval, QWidget *parent) :
+    TimerWindow(updateInterval, parent)
+
+{
+    setDuration(msec);
+}
+
+void TimerWindow::setDuration(int msec)
+{
+    msecTimer = msec;
+}
+
+void TimerWindow::setUpdateInterval(int msec)
+{
+    msecUpdateInterval = msec;
 }
 
 void TimerWindow::launch()
@@ -50,6 +66,17 @@ void TimerWindow::fadeOut()
     connect(anim, SIGNAL(finished()), this, SLOT(close()));
 }
 
+void TimerWindow::fadeOutNoFinished()
+{
+    QPropertyAnimation *anim = new QPropertyAnimation(this, "windowOpacity"); // TODO: deduplicate
+    anim->setDuration(500);
+    anim->setStartValue(1);
+    anim->setEndValue(0);
+    anim->setEasingCurve(QEasingCurve::OutBack);
+    anim->start(QPropertyAnimation::DeleteWhenStopped);
+    connect(anim, SIGNAL(finished()), this, SLOT(close()));
+}
+
 void TimerWindow::startCountdown()
 {
     ticker.start(msecUpdateInterval);
@@ -64,6 +91,13 @@ void TimerWindow::countdownFinished()
 void TimerWindow::timerTick()
 {
     updateCountdownDisplay(timer.remainingTime());
+}
+
+void TimerWindow::stop()
+{
+    ticker.stop();
+    timer.stop();
+    fadeOutNoFinished();
 }
 
 void TimerWindow::timerFinished()

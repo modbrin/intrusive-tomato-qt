@@ -6,12 +6,13 @@
 #include <QMouseEvent>
 #include <QIntValidator>
 #include <QStyle>
+#include <QMessageBox>
 #include "notificationwindow.h"
 #include "fullscreentimer.h"
 #include "utils.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : TimerWindow()
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -30,12 +31,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->startButton->setStyleSheet("background-color: rgb(20, 110, 23);");
     ui->bottomLine->setStyleSheet("color: transparent;");
     ui->bottomLine2->setStyleSheet("color: transparent;");
+    ui->stopButton->setEnabled(false);
     adjustSize();
 
     ui->workMinutes->setValidator( new QIntValidator(1, 900, this) );
     ui->breakMinutes->setValidator( new QIntValidator(1, 300, this) );
     ui->workMinutes->setText(QString::number(35));
     ui->breakMinutes->setText(QString::number(5));
+
+    // default progress bar state
+    ui->progressBar->setMinimum(0);
+    ui->progressBar->setMaximum(100);
+    ui->progressBar->setValue(0);
+    ui->progressBar->setTextVisible(false);
 
     // system tray icon
     trayIcon = new QSystemTrayIcon(this);
@@ -62,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // handle working time progress
 
+
+
     // TODO: refactor all
     // TODO: implement timer in this window and check if it works if window is hidden
 }
@@ -81,6 +91,10 @@ void MainWindow::showHide(QSystemTrayIcon::ActivationReason r)
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete trayIcon;
+    delete trayMenu;
+    delete trayQuitAction;
+    delete trayRestoreAction;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {
@@ -92,19 +106,102 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
     move(event->globalX() - m_nMouseClick_X_Coordinate, event->globalY() - m_nMouseClick_Y_Coordinate);
 }
 
+void MainWindow::showMessage(const QString& msg) {
+    QMessageBox mb;
+    mb.setText(msg);
+    mb.exec();
+}
+
+void MainWindow::updateCountdownDisplay(int msec)
+{
+    QTime time(0,0,0);
+    time = time.addMSecs(msec);
+    ui->progressBar->setValue(msec);
+}
+
+void MainWindow::fadeIn()
+{
+    // override to disable fading effects
+    QTimer::singleShot(0, this, SLOT(startCountdown()));
+}
+
+void MainWindow::fadeOut()
+{
+    // override to disable fading effects
+    QTimer::singleShot(0, this, SLOT(countdownFinished()));
+}
+
+void MainWindow::fadeOutNoFinished()
+{
+    // override to do nothing
+}
+
 void MainWindow::startButtonClicked()
 {
-    // check input validity
+    // get and parse user input
+    auto workMinInput = ui->workMinutes->text();
+    auto breakMinInput = ui->breakMinutes->text();
+
+    bool workParsedOk, breakParsedOk;
+
+    int minWorkParsed = workMinInput.toInt(&workParsedOk);
+    if (workParsedOk) {
+        workParsedOk = minWorkParsed >= 1 && minWorkParsed <= 900;
+    }
+    if (!workParsedOk) {
+        showMessage("Set work minutes to be between 1 and 900.");
+        return;
+    }
+
+    int minBreakParsed = breakMinInput.toInt(&breakParsedOk);
+    if (breakParsedOk) {
+        breakParsedOk = minBreakParsed >= 1 && minBreakParsed <= 300;
+    }
+    if (!breakParsedOk) {
+        showMessage("Set break minutes to be between 1 and 300.");
+        return;
+    }
+
     // update timer values
+    msecWork = minWorkParsed * 60 * 1'000;
+    msecBreak = minBreakParsed * 60 * 1'000;
+    setDuration(msecWork);
+    ui->progressBar->setMaximum(msecWork);
+    ui->progressBar->setMinimum(0);
+
     // block input
+    ui->workMinutes->setEnabled(false);
+    ui->breakMinutes->setEnabled(false);
+
     // block start button
+    ui->startButton->setEnabled(false);
+
     // unlock stop button
+    ui->stopButton->setEnabled(true);
+
+    // trigger session start
     breakSessionFinished();
 }
 
 void MainWindow::stopButtonClicked()
 {
-    // TODO: throw stop signal to timers
+    emit stopRequested();
+
+    // unlock input
+    ui->workMinutes->setEnabled(true);
+    ui->breakMinutes->setEnabled(true);
+
+    // unlock start button
+    ui->startButton->setEnabled(true);
+
+    // block stop button
+    ui->stopButton->setEnabled(false);
+
+    // reset progress bar
+    ui->progressBar->setMinimum(0); // TODO: make separate function for this?
+    ui->progressBar->setMaximum(100);
+    ui->progressBar->setValue(0);
+
 }
 
 void MainWindow::workSessionFinished()
@@ -114,6 +211,7 @@ void MainWindow::workSessionFinished()
     auto* win = new NotificationWindow("until break", msecPrepare); // no manual delete, window performs deletion on close
     connect(this, SIGNAL(startPreparationTimer()), win, SLOT(launch()));
     connect(win, SIGNAL(finished()), this, SLOT(preparationTimerFinished()));
+    connect(this, SIGNAL(stopRequested()), win, SLOT(stop()));
 
     win->show();
     emit startPreparationTimer();
@@ -126,6 +224,7 @@ void MainWindow::preparationTimerFinished()
     auto* win = new FullscreenTimer(msecBreak); // no manual delete, window performs deletion on close
     connect(this, SIGNAL(startBreakSession()), win, SLOT(launch()));
     connect(win, SIGNAL(finished()), SLOT(breakSessionFinished()));
+    connect(this, SIGNAL(stopRequested()), win, SLOT(stop()));
 
     win->show();
     emit startBreakSession();
@@ -135,20 +234,16 @@ void MainWindow::breakSessionFinished()
 {
     qDebug() << __FILE__ << __LINE__ << "Break Session Finished";
 
-    auto* win = new NotificationWindow("work session", msecWork); // no manual delete, window performs deletion on close
+    connect(this, SIGNAL(startWorkSession()), this, SLOT(launch()));
+    connect(this, SIGNAL(finished()), this, SLOT(workSessionFinished()));
+    connect(this, SIGNAL(stopRequested()), this, SLOT(stop()));
 
-    connect(this, SIGNAL(startWorkSession()), win, SLOT(launch()));
-    connect(win, SIGNAL(finished()), this, SLOT(workSessionFinished()));
-
-    win->show();
     emit startWorkSession();
 }
 
 
 // TODOS
-// - start work timer
-// - work timer
-// - minimize to tray
+// - update fonts
 
 // TODO Perspective
 // - calendar integration
