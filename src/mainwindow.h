@@ -24,7 +24,7 @@ private: // containers
     Ui::MainWindow *ui;
     int msecWork = 15'000; // 1 minute default work session
     int msecBreak = 15'000; // 1 minutes default work session
-    int msecPrepare = 30'000; // 30 seconds default prepare timer
+    int msecPrepare = 20'000; // 20 seconds default prepare timer
 
 private: // functions
     void showMessage(const QString& msg);

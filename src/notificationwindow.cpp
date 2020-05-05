@@ -7,12 +7,15 @@
 #include <QDebug>
 #include <string>
 #include <chrono>
+#include <QFontDatabase>
 
 NotificationWindow::NotificationWindow(QString message, int msec, int updateInterval, QWidget *parent) :
     TimerWindow(msec, updateInterval, parent),
     ui(new Ui::NotificationWindow)
 {
     ui->setupUi(this);
+
+    QFontDatabase::addApplicationFont (":/fonts/misc/OpenSans.ttf");
 
     // setup window
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::SubWindow);

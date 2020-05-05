@@ -18,12 +18,15 @@ public:
     explicit FullscreenTimer(int msec, int updateInterval = 200, QWidget *parent = nullptr);
     ~FullscreenTimer();
 
-
 private: // functions
     virtual void updateCountdownDisplay(int msec) override;
+    virtual void timerFinished() override;
 
 private: // containers
     Ui::FullscreenTimer *ui;
+
+private slots:
+    void breakFinishConfirmed();
 
 };
 

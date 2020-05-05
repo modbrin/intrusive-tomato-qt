@@ -246,17 +246,3 @@ void MainWindow::breakSessionFinished()
 
     emit startWorkSession();
 }
-
-
-// TODO (until v0.1
-// - [x] use custom fonts
-// - [ ] add prompt to finish break
-// - [x] center text in inputs
-// - [x] make buttons disappear when unused
-
-// Future
-// - calendar integration
-// - long breaks
-// - learning user habits
-// - "seamless" startup
-// - tests

@@ -37,7 +37,7 @@ public slots:
 
 protected slots:
     void timerTick(); // update display with current time
-    void timerFinished(); // stop timers and fade out
+    virtual void timerFinished(); // stop timers and fade out
     void startCountdown(); // launch actual timers
     void countdownFinished(); // emit finished() signal
     void stop(); // interrupt execution without finished() signal
