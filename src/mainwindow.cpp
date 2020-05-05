@@ -7,15 +7,20 @@
 #include <QIntValidator>
 #include <QStyle>
 #include <QMessageBox>
+#include <QFontDatabase>
 #include "notificationwindow.h"
 #include "fullscreentimer.h"
 #include "utils.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget*)
     : TimerWindow()
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // setup fonts
+    QFontDatabase::addApplicationFont (":/fonts/misc/OpenSans.ttf");
+    setStyleSheet("font-family: Open Sans;"); // stylesheet needs to be applied in each window
 
     // window configs
     setWindowFlags(Qt::FramelessWindowHint);
@@ -32,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->bottomLine->setStyleSheet("color: transparent;");
     ui->bottomLine2->setStyleSheet("color: transparent;");
     ui->stopButton->setEnabled(false);
+    ui->stopButton->setVisible(false);
     adjustSize();
 
     ui->workMinutes->setValidator( new QIntValidator(1, 900, this) );
@@ -68,12 +74,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
     connect(ui->stopButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
 
-    // handle working time progress
-
-
-
-    // TODO: refactor all
-    // TODO: implement timer in this window and check if it works if window is hidden
+    // connect timer signals for this window
+    connect(this, SIGNAL(startWorkSession()), this, SLOT(launch()));
+    connect(this, SIGNAL(finished()), this, SLOT(workSessionFinished()));
+    connect(this, SIGNAL(stopRequested()), this, SLOT(stop()));
 }
 
 void MainWindow::showHide(QSystemTrayIcon::ActivationReason r)
@@ -175,9 +179,11 @@ void MainWindow::startButtonClicked()
 
     // block start button
     ui->startButton->setEnabled(false);
+    ui->startButton->setVisible(false);
 
     // unlock stop button
     ui->stopButton->setEnabled(true);
+    ui->stopButton->setVisible(true);
 
     // trigger session start
     breakSessionFinished();
@@ -193,9 +199,11 @@ void MainWindow::stopButtonClicked()
 
     // unlock start button
     ui->startButton->setEnabled(true);
+    ui->startButton->setVisible(true);
 
     // block stop button
     ui->stopButton->setEnabled(false);
+    ui->stopButton->setVisible(false);
 
     // reset progress bar
     ui->progressBar->setMinimum(0); // TODO: make separate function for this?
@@ -212,8 +220,10 @@ void MainWindow::workSessionFinished()
     connect(this, SIGNAL(startPreparationTimer()), win, SLOT(launch()));
     connect(win, SIGNAL(finished()), this, SLOT(preparationTimerFinished()));
     connect(this, SIGNAL(stopRequested()), win, SLOT(stop()));
-
     win->show();
+
+    ui->progressBar->setValue(0);
+
     emit startPreparationTimer();
 }
 
@@ -225,8 +235,8 @@ void MainWindow::preparationTimerFinished()
     connect(this, SIGNAL(startBreakSession()), win, SLOT(launch()));
     connect(win, SIGNAL(finished()), SLOT(breakSessionFinished()));
     connect(this, SIGNAL(stopRequested()), win, SLOT(stop()));
-
     win->show();
+
     emit startBreakSession();
 }
 
@@ -234,20 +244,19 @@ void MainWindow::breakSessionFinished()
 {
     qDebug() << __FILE__ << __LINE__ << "Break Session Finished";
 
-    connect(this, SIGNAL(startWorkSession()), this, SLOT(launch()));
-    connect(this, SIGNAL(finished()), this, SLOT(workSessionFinished()));
-    connect(this, SIGNAL(stopRequested()), this, SLOT(stop()));
-
     emit startWorkSession();
 }
 
 
-// TODOS
-// - update fonts
+// TODO (until v0.1
+// - [x] use custom fonts
+// - [ ] add prompt to finish break
+// - [x] center text in inputs
+// - [x] make buttons disappear when unused
 
-// TODO Perspective
+// Future
 // - calendar integration
 // - long breaks
 // - learning user habits
 // - "seamless" startup
-// - tests?
+// - tests

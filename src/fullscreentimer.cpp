@@ -13,11 +13,11 @@ FullscreenTimer::FullscreenTimer(int msec, int updateInterval, QWidget *parent) 
 
     // setup window
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::SubWindow);
-    setStyleSheet("background-color:rgba( 0, 0, 0, 50% );");
+    setStyleSheet("font-family: Open Sans; background-color:rgba( 0, 0, 0, 50% );");
     enableWindowBackgroundBlur(this);
-    setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    QTimer::singleShot(0, this, SLOT(showFullScreen()));
-    setAttribute(Qt::WA_DeleteOnClose, true); // when closed window will deallocate its memory
+    //setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    QTimer::singleShot(0, this, SLOT(showFullScreen())); // set to fullscreen
+    setAttribute(Qt::WA_DeleteOnClose); // when closed window will deallocate its memory
     setProperty("windowOpacity", 0); // start invisible
 
     // edittext style setter

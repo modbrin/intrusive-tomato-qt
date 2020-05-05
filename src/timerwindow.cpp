@@ -1,7 +1,6 @@
 #include "timerwindow.h"
 #include "utils.h"
 #include <QGraphicsOpacityEffect>
-#include <QPropertyAnimation>
 #include <QScreen>
 #include <QDebug>
 #include <string>
@@ -17,7 +16,6 @@ TimerWindow::TimerWindow(int updateInterval, QWidget *parent) :
 
 TimerWindow::TimerWindow(int msec, int updateInterval, QWidget *parent) :
     TimerWindow(updateInterval, parent)
-
 {
     setDuration(msec);
 }
@@ -52,29 +50,32 @@ void TimerWindow::fadeIn()
     anim->setEndValue(1);
     anim->setEasingCurve(QEasingCurve::InBack);
     anim->start(QPropertyAnimation::DeleteWhenStopped);
+
 }
 
-void TimerWindow::fadeOut()
+QPropertyAnimation* TimerWindow::makeFadeOutAnimation()
 {
     QPropertyAnimation *anim = new QPropertyAnimation(this, "windowOpacity");
     anim->setDuration(500);
     anim->setStartValue(1);
     anim->setEndValue(0);
     anim->setEasingCurve(QEasingCurve::OutBack);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
+    return anim;
+}
+
+void TimerWindow::fadeOut()
+{
+    auto anim = makeFadeOutAnimation();
     connect(anim, SIGNAL(finished()), this, SLOT(countdownFinished()));
     connect(anim, SIGNAL(finished()), this, SLOT(close()));
+    anim->start(QPropertyAnimation::DeleteWhenStopped);
 }
 
 void TimerWindow::fadeOutNoFinished()
 {
-    QPropertyAnimation *anim = new QPropertyAnimation(this, "windowOpacity"); // TODO: deduplicate
-    anim->setDuration(500);
-    anim->setStartValue(1);
-    anim->setEndValue(0);
-    anim->setEasingCurve(QEasingCurve::OutBack);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
+    auto anim = makeFadeOutAnimation();
     connect(anim, SIGNAL(finished()), this, SLOT(close()));
+    anim->start(QPropertyAnimation::DeleteWhenStopped);
 }
 
 void TimerWindow::startCountdown()

@@ -16,9 +16,9 @@ NotificationWindow::NotificationWindow(QString message, int msec, int updateInte
 
     // setup window
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::SubWindow);
-    setStyleSheet("background-color:rgba( 255, 81, 0, 30% );");
+    setStyleSheet("font-family: Open Sans; background-color:rgba( 255, 81, 0, 30% );");
     enableWindowBackgroundBlur(this);
-    setAttribute(Qt::WA_DeleteOnClose, true); // when closed window will deallocate its memory
+    setAttribute(Qt::WA_DeleteOnClose); // when closed window will deallocate its memory
     setProperty("windowOpacity", 0); // start invisible
 
     // position window
@@ -43,7 +43,7 @@ NotificationWindow::NotificationWindow(QString message, int msec, int updateInte
 
 void NotificationWindow::updateCountdownDisplay(int msec)
 {
-    QTime time(0,0,0);
+    QTime time(0, 0, 0);
     time = time.addMSecs(msec);
 
     ui->timeField->setText(QString::number(time.minute()).rightJustified(2, '0')

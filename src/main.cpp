@@ -2,18 +2,21 @@
 #include <QApplication>
 #include <QSettings>
 #include <QStyleFactory>
+#include <QFontDatabase>
+#include <QFile>
 
 
 
 int main(int argc, char *argv[])
 {
+
     QApplication a(argc, argv);
     MainWindow w;
 
 #ifdef Q_OS_WIN
     // Dark Theme taken from https://forum.qt.io/topic/101391/windows-10-dark-theme/5
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",QSettings::NativeFormat);
-    if(settings.value("AppsUseLightTheme")==0){
+    if(settings.value("AppsUseLightTheme") == 0){
         qApp->setStyle(QStyleFactory::create("Fusion"));
         QPalette darkPalette;
         QColor darkColor = QColor(45,45,45);
@@ -31,13 +34,11 @@ int main(int argc, char *argv[])
         darkPalette.setColor(QPalette::Disabled, QPalette::ButtonText, disabledColor);
         darkPalette.setColor(QPalette::BrightText, Qt::red);
         darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-
         darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
         darkPalette.setColor(QPalette::HighlightedText, Qt::black);
         darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, disabledColor);
 
         qApp->setPalette(darkPalette);
-
         qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
     }
 #endif

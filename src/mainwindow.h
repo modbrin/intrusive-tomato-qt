@@ -58,7 +58,5 @@ private: // handling tray actions
     QMenu *trayMenu;
     QAction *trayQuitAction;
     QAction *trayRestoreAction;
-
-
 };
 #endif // MAINWINDOW_H

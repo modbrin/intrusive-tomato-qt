@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTimer>
 #include <QTime>
+#include <QPropertyAnimation>
 
 class TimerWindow : public QWidget
 {
@@ -27,6 +28,9 @@ protected: // functions
     virtual void fadeOut();
     virtual void fadeOutNoFinished();
     virtual void updateCountdownDisplay(int msec) = 0;
+
+private:
+    QPropertyAnimation* makeFadeOutAnimation();
 
 public slots:
     void launch(); // fade in and start countdown

@@ -52,7 +52,6 @@
       <widget class="QPushButton" name="trayButton">
        <property name="font">
         <font>
-         <family>Segoe MDL2 Assets</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -71,7 +70,6 @@
        </property>
        <property name="font">
         <font>
-         <family>Segoe MDL2 Assets</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -101,15 +99,15 @@
          <item>
           <widget class="QLineEdit" name="workMinutes">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Ignored" vsizetype="Minimum">
+            <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="font">
             <font>
-             <family>Segoe MDL2 Assets</family>
              <pointsize>30</pointsize>
+             <stylestrategy>PreferDefault</stylestrategy>
             </font>
            </property>
            <property name="inputMethodHints">
@@ -151,7 +149,6 @@
          </property>
          <property name="font">
           <font>
-           <family>Segoe MDL2 Assets</family>
            <pointsize>16</pointsize>
           </font>
          </property>
@@ -172,14 +169,13 @@
          <item>
           <widget class="QLineEdit" name="breakMinutes">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Ignored" vsizetype="Minimum">
+            <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="font">
             <font>
-             <family>Segoe MDL2 Assets</family>
              <pointsize>30</pointsize>
             </font>
            </property>
@@ -222,7 +218,6 @@
          </property>
          <property name="font">
           <font>
-           <family>Segoe MDL2 Assets</family>
            <pointsize>16</pointsize>
           </font>
          </property>
@@ -289,7 +284,6 @@
       <widget class="QPushButton" name="startButton">
        <property name="font">
         <font>
-         <family>Segoe MDL2 Assets</family>
          <pointsize>16</pointsize>
         </font>
        </property>
@@ -302,7 +296,6 @@
       <widget class="QPushButton" name="stopButton">
        <property name="font">
         <font>
-         <family>Segoe MDL2 Assets</family>
          <pointsize>16</pointsize>
         </font>
        </property>
