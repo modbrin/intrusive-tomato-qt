@@ -11,7 +11,6 @@ Hypothesis of this app is that long working sessions affect productivity in a ba
 + Configurable work and break intervals
 + Acrylic blur background effect for Windows 10
 + Minimize to tray
-+ New working session
 + Free and open source forever
 
 <p align="center">
