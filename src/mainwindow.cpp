@@ -29,8 +29,8 @@ MainWindow::MainWindow(QWidget*)
     setFixedSize(this->size());
 
     // ui controls config
-    ui->closeButton->setFixedSize(QSize(30, 30));
-    ui->trayButton->setFixedSize(QSize(50, 30));
+    //ui->closeButton->setFixedSize(QSize(30, 30));
+    //ui->trayButton->setFixedSize(QSize(50, 30));
     ui->closeButton->setStyleSheet("background-color: rgb(112, 21, 21);");
     ui->stopButton->setStyleSheet("background-color: rgb(112, 21, 21);");
     ui->startButton->setStyleSheet("background-color: rgb(20, 110, 23);");
@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget*)
     ui->bottomLine2->setStyleSheet("color: transparent;");
     ui->stopButton->setEnabled(false);
     ui->stopButton->setVisible(false);
-    adjustSize();
+
 
     ui->workMinutes->setValidator( new QIntValidator(1, 900, this) );
     ui->breakMinutes->setValidator( new QIntValidator(1, 300, this) );
@@ -78,6 +78,8 @@ MainWindow::MainWindow(QWidget*)
     connect(this, SIGNAL(startWorkSession()), this, SLOT(launch()));
     connect(this, SIGNAL(finished()), this, SLOT(workSessionFinished()));
     connect(this, SIGNAL(stopRequested()), this, SLOT(stop()));
+
+    adjustSize();
 }
 
 void MainWindow::showHide(QSystemTrayIcon::ActivationReason r)
