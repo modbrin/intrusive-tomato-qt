@@ -26,18 +26,36 @@ MainWindow::MainWindow(QWidget*)
     setWindowFlags(Qt::FramelessWindowHint);
     connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui->trayButton, SIGNAL(clicked()), this, SLOT(hide()));
-    setFixedSize(this->size());
+    setFixedWidth(this->width());
 
     // ui controls config
-    //ui->closeButton->setFixedSize(QSize(30, 30));
-    //ui->trayButton->setFixedSize(QSize(50, 30));
     ui->closeButton->setStyleSheet("background-color: rgb(112, 21, 21);");
-    ui->stopButton->setStyleSheet("background-color: rgb(112, 21, 21);");
-    ui->startButton->setStyleSheet("background-color: rgb(20, 110, 23);");
+    ui->stopButton->setStyleSheet("QPushButton{background-color: rgba(158, 14, 14, 30%);"
+                                  "padding: 8px 16px 8px 16px;"
+                                  "border-style: outset;"
+                                  "border-width: 2px;"
+                                  "border-radius: 10px;"
+                                  "border-color: gray;}"
+                                  "QPushButton:hover{background-color: rgba(158, 14, 14, 40%);}"
+                                  "QPushButton:pressed{background-color: rgba(255, 255, 255, 20%);}");
+
+    ui->startButton->setStyleSheet("QPushButton{background-color: rgba(31, 102, 9, 30%);"
+                                   "padding: 8px 16px 8px 16px;"
+                                   "border-style: outset;"
+                                   "border-width: 2px;"
+                                   "border-radius: 10px;"
+                                   "border-color: gray;}"
+                                   "QPushButton:hover{background-color: rgba(31, 102, 9, 40%);}"
+                                   "QPushButton:pressed{background-color: rgba(255, 255, 255, 20%);}");
+
+    ui->closeButton->setFixedWidth(ui->closeButton->width() * 0.4);
+    ui->trayButton->setFixedWidth(ui->trayButton->width() * 0.6);
+
     ui->bottomLine->setStyleSheet("color: transparent;");
     ui->bottomLine2->setStyleSheet("color: transparent;");
     ui->stopButton->setEnabled(false);
     ui->stopButton->setVisible(false);
+
 
 
     ui->workMinutes->setValidator( new QIntValidator(1, 900, this) );
@@ -52,21 +70,21 @@ MainWindow::MainWindow(QWidget*)
     ui->progressBar->setTextVisible(false);
 
     // system tray icon
-    trayIcon = new QSystemTrayIcon(this);
+    trayIcon = std::unique_ptr<QSystemTrayIcon>(new QSystemTrayIcon(this));
     trayIcon->setIcon(QIcon(":/images/icon.ico"));
     trayIcon->setToolTip("QTomato");
 
-    trayMenu = new QMenu(this);
-    trayIcon->setContextMenu(trayMenu);
-    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(showHide(QSystemTrayIcon::ActivationReason)));
+    trayMenu = std::unique_ptr<QMenu>(new QMenu(this));
+    trayIcon->setContextMenu(trayMenu.get());
+    connect(trayIcon.get(), SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(showHide(QSystemTrayIcon::ActivationReason)));
 
-    trayQuitAction = new QAction("Quit",this); // TODO: is context menu really needed?
-    connect(trayQuitAction,SIGNAL(triggered()),this,SLOT(close()));
-    trayMenu->addAction(trayQuitAction);
+    trayQuitAction = std::unique_ptr<QAction>(new QAction("Quit",this)); // TODO: is context menu really needed?
+    connect(trayQuitAction.get(),SIGNAL(triggered()),this,SLOT(close()));
+    trayMenu->addAction(trayQuitAction.get());
 
-    trayRestoreAction = new QAction("Restore",this);
-    connect(trayRestoreAction,SIGNAL(triggered()),this,SLOT(showNormal()));
-    trayMenu->addAction(trayRestoreAction);
+    trayRestoreAction = std::unique_ptr<QAction>(new QAction("Restore",this));
+    connect(trayRestoreAction.get(),SIGNAL(triggered()),this,SLOT(showNormal()));
+    trayMenu->addAction(trayRestoreAction.get());
 
     trayIcon->show();
 
@@ -97,10 +115,6 @@ void MainWindow::showHide(QSystemTrayIcon::ActivationReason r)
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete trayIcon;
-    delete trayMenu;
-    delete trayQuitAction;
-    delete trayRestoreAction;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {

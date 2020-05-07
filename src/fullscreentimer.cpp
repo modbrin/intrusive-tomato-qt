@@ -20,7 +20,14 @@ FullscreenTimer::FullscreenTimer(int msec, int updateInterval, QWidget *parent) 
     setProperty("windowOpacity", 0); // start invisible
 
     // setup confirmation button
-    ui->confirmButton->setStyleSheet("padding: 8px 16px 8px 16px; background-color: rgb(20, 110, 23);");
+    ui->confirmButton->setStyleSheet("QPushButton{background-color: rgba(255,255,255, 0%);"
+                                     "padding: 8px 16px 8px 16px;"
+                                     "border-style: outset;"
+                                     "border-width: 2px;"
+                                     "border-radius: 10px;"
+                                     "border-color: white;}"
+                                     "QPushButton:hover{background-color: rgba(255,255,255, 10%);}"
+                                     "QPushButton:pressed{background-color: rgba(255,255,255, 20%);}");
     ui->confirmButton->setEnabled(false);
     ui->confirmButton->setVisible(false);
     connect(ui->confirmButton, SIGNAL(clicked()), this, SLOT(breakFinishConfirmed()));
@@ -54,8 +61,11 @@ void FullscreenTimer::timerFinished()
     // hide message
     ui->message->setVisible(false);
 
+    // hide timer
+    //ui->timeField->setVisible(false); // without it looks kind of strange
+
     // show confirmation button
-    ui->confirmButton->setEnabled(true);
+    ui->confirmButton->setEnabled(true); // TODO: add animation
     ui->confirmButton->setVisible(true);
 }
 

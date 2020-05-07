@@ -54,9 +54,9 @@ private: // handling dragging
     int m_nMouseClick_Y_Coordinate;
 
 private: // handling tray actions
-    QSystemTrayIcon *trayIcon;
-    QMenu *trayMenu;
-    QAction *trayQuitAction;
-    QAction *trayRestoreAction;
+    std::unique_ptr<QSystemTrayIcon> trayIcon;
+    std::unique_ptr<QMenu> trayMenu;
+    std::unique_ptr<QAction> trayQuitAction;
+    std::unique_ptr<QAction> trayRestoreAction;
 };
 #endif // MAINWINDOW_H
