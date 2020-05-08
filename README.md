@@ -4,6 +4,10 @@
 
 Hypothesis of this app is that long working sessions affect productivity in a bad way but more importantly long sitting sessions can be of great harm to health. The goal is to break sessions into chunks and suggest user to stand up and do some exercises.
 
+It is not designed to fight with you, just effectively interrupt you from working. So you can terminate it at this point (may be made more difficult in future), but do you really want to...
+
+NOTE: This app primarily targets Windows 10; It also works under Linux losing blur/transparency effects (check out gnome-pomodoro app); It doesn't work under macos due to os limitations.
+
 > For download visit [Releases](https://github.com/modbrin/intrusive-tomato-qt/releases)
 
 ## Features
@@ -34,6 +38,7 @@ Use Qt Creator for building, default version is dynamically linked. If you want 
 + "Seamless" startup
 + Long breaks
 + Activity suggestions during breaks
++ Flow mode for gaming/movies
 + Reminders and task tracking
 + Google Calendar / Microsoft Outlook integration
 + Learning user habits
