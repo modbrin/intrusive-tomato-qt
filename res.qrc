@@ -1,8 +1,14 @@
 <RCC>
     <qresource prefix="/images">
         <file>icon.ico</file>
+        <file>misc/play_icon.png</file>
+        <file>misc/stop_icon.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file>misc/OpenSans.ttf</file>
+    </qresource>
+    <qresource prefix="/sounds">
+        <file>misc/drip.wav</file>
+        <file>misc/notification.wav</file>
     </qresource>
 </RCC>

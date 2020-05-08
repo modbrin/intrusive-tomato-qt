@@ -8,12 +8,16 @@
 #include <QStyle>
 #include <QMessageBox>
 #include <QFontDatabase>
+#include <QGraphicsOpacityEffect>
+#include <QSound>
 #include "notificationwindow.h"
 #include "fullscreentimer.h"
 #include "utils.h"
+#include <sstream>
+
 
 MainWindow::MainWindow(QWidget*)
-    : TimerWindow()
+    : TimerWindow(2000, nullptr)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -26,38 +30,75 @@ MainWindow::MainWindow(QWidget*)
     setWindowFlags(Qt::FramelessWindowHint);
     connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui->trayButton, SIGNAL(clicked()), this, SLOT(hide()));
-    setFixedWidth(this->width());
+    ui->workMinutes->setFixedWidth(ui->workMinutes->width());
+    ui->breakMinutes->setFixedWidth(ui->breakMinutes->width());
 
-    // ui controls config
+    // style ui controls
+    auto buttonStyle = [](auto color, auto icon_url, auto padding) {
+        std::stringstream ss;
+        ss << "QPushButton{background-color: rgba(" << color << ", 30%);"
+               "image: url(" << icon_url << ");"
+               "padding: " << padding << ";"
+               "border-style: outset;"
+               "border-width: 0px;"
+               "border-radius: 15px;"
+               "border-color: gray;}"
+               "QPushButton:hover{background-color: rgba(" << color << ", 40%);}"
+               "QPushButton:pressed{background-color: rgba(255, 255, 255, 20%);}";
+        return ss.str();
+    };
+
+    auto inputStyle = "QLineEdit{background-color: rgba(255, 255, 255, 10%);"
+                      "border-style: outset;"
+                      "border-width: 0px;"
+                      "border-radius: 7px;}";
+
+    auto progressStyle = "QProgressBar {"
+                         "border-style: outset;"
+                         "border-width: 0px;"
+                         "border-radius: 7px;"
+                         "background-color: rgba(255,255,255,10%);}"
+                         "QProgressBar::chunk {"
+                         "border-style: outset;"
+                         "border-width: 0px;"
+                         "border-radius: 7px;"
+                         "background-color: rgba(128, 226, 126, 50%);}";
+
+    ui->startButton->setStyleSheet(buttonStyle("128, 226, 126", ":/images/misc/play_icon.png", "20px 8px 20px 14px").c_str());
+    ui->stopButton->setStyleSheet(buttonStyle("255, 111, 96", ":/images/misc/stop_icon.png", "20px 10px 20px 10px").c_str());
+    ui->progressBar->setStyleSheet(progressStyle);
+    ui->workMinutes->setStyleSheet(inputStyle);
+    ui->breakMinutes->setStyleSheet(inputStyle);
+    ui->trayButton->setStyleSheet("QPushButton {background-color: rgb(40,40,40);}");
     ui->closeButton->setStyleSheet("background-color: rgb(112, 21, 21);");
-    ui->stopButton->setStyleSheet("QPushButton{background-color: rgba(158, 14, 14, 30%);"
-                                  "padding: 8px 16px 8px 16px;"
-                                  "border-style: outset;"
-                                  "border-width: 2px;"
-                                  "border-radius: 10px;"
-                                  "border-color: gray;}"
-                                  "QPushButton:hover{background-color: rgba(158, 14, 14, 40%);}"
-                                  "QPushButton:pressed{background-color: rgba(255, 255, 255, 20%);}");
 
-    ui->startButton->setStyleSheet("QPushButton{background-color: rgba(31, 102, 9, 30%);"
-                                   "padding: 8px 16px 8px 16px;"
-                                   "border-style: outset;"
-                                   "border-width: 2px;"
-                                   "border-radius: 10px;"
-                                   "border-color: gray;}"
-                                   "QPushButton:hover{background-color: rgba(31, 102, 9, 40%);}"
-                                   "QPushButton:pressed{background-color: rgba(255, 255, 255, 20%);}");
+    // apply shadow effect
+    QGraphicsDropShadowEffect *shadowEffect = new QGraphicsDropShadowEffect;
+    shadowEffect->setColor(Qt::black);
+    shadowEffect->setXOffset(0);
+    shadowEffect->setYOffset(5);
+    shadowEffect->setBlurRadius(15);
 
+    ui->startButton->setGraphicsEffect(shadowEffect);
+    ui->stopButton->setGraphicsEffect(shadowEffect);
+    ui->workMinutes->setGraphicsEffect(shadowEffect);
+    ui->breakMinutes->setGraphicsEffect(shadowEffect);
+    ui->progressBar->setGraphicsEffect(shadowEffect);
+
+    // resize upper buttons
     ui->closeButton->setFixedWidth(ui->closeButton->width() * 0.4);
     ui->trayButton->setFixedWidth(ui->trayButton->width() * 0.6);
 
+    // style separator lines
+    ui->upperLine->setStyleSheet("color: gray;");
     ui->bottomLine->setStyleSheet("color: transparent;");
     ui->bottomLine2->setStyleSheet("color: transparent;");
+
+    // disable start button on launch
     ui->stopButton->setEnabled(false);
     ui->stopButton->setVisible(false);
 
-
-
+    // set validators for input fields
     ui->workMinutes->setValidator( new QIntValidator(1, 900, this) );
     ui->breakMinutes->setValidator( new QIntValidator(1, 300, this) );
     ui->workMinutes->setText(QString::number(35));
@@ -134,9 +175,13 @@ void MainWindow::showMessage(const QString& msg) {
 
 void MainWindow::updateCountdownDisplay(int msec)
 {
+
     QTime time(0,0,0);
     time = time.addMSecs(msec);
     ui->progressBar->setValue(msec);
+    if (!isHidden()){
+        ui->progressBar->repaint();
+    }
 }
 
 void MainWindow::fadeIn()
@@ -240,6 +285,8 @@ void MainWindow::workSessionFinished()
 
     ui->progressBar->setValue(0);
 
+    QSound::play(":/sounds/misc/notification.wav");
+
     emit startPreparationTimer();
 }
 
@@ -253,12 +300,16 @@ void MainWindow::preparationTimerFinished()
     connect(this, SIGNAL(stopRequested()), win, SLOT(stop()));
     win->show();
 
+    QSound::play(":/sounds/misc/drip.wav");
+
     emit startBreakSession();
 }
 
 void MainWindow::breakSessionFinished()
 {
     qDebug() << __FILE__ << __LINE__ << "Break Session Finished";
+
+    ui->progressBar->setValue(msecWork);
 
     emit startWorkSession();
 }

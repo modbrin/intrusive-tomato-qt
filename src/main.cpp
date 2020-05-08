@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     if(settings.value("AppsUseLightTheme") == 0){
         qApp->setStyle(QStyleFactory::create("Fusion"));
         QPalette darkPalette;
-        QColor darkColor = QColor(45,45,45);
+        QColor darkColor = QColor(18,18,18);
         QColor disabledColor = QColor(127,127,127);
         darkPalette.setColor(QPalette::Window, darkColor);
         darkPalette.setColor(QPalette::WindowText, Qt::white);
