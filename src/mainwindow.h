@@ -40,6 +40,7 @@ public slots:
     void breakSessionFinished();
     void workSessionFinished();
     void showHide(QSystemTrayIcon::ActivationReason);
+    void checkboxStateChanged();
 
 signals:
     void startPreparationTimer();

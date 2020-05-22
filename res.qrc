@@ -3,6 +3,7 @@
         <file>icon.ico</file>
         <file>misc/play_icon.png</file>
         <file>misc/stop_icon.png</file>
+        <file>misc/checked.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file>misc/OpenSans.ttf</file>

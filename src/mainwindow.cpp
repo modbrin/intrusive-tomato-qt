@@ -10,6 +10,7 @@
 #include <QFontDatabase>
 #include <QGraphicsOpacityEffect>
 #include <QSound>
+#include <QSettings>
 #include "notificationwindow.h"
 #include "fullscreentimer.h"
 #include "utils.h"
@@ -64,6 +65,17 @@ MainWindow::MainWindow(QWidget*)
                          "border-radius: 7px;"
                          "background-color: rgba(128, 226, 126, 50%);}";
 
+    auto checkboxStyle = "QCheckBox::indicator {"
+                         "width: 16px;"
+                         "height: 16px;}"
+                         "QCheckBox::indicator {background-color: rgba(255, 255, 255, 10%);"
+                         "border-style: outset;"
+                         "border-width: 0px;"
+                         "border-radius: 2px;}"
+                         "QCheckBox::indicator:unchecked {}"
+                         "QCheckBox::indicator:checked {"
+                         "image: url(:/images/misc/checked.png);}";
+
     ui->startButton->setStyleSheet(buttonStyle("128, 226, 126", ":/images/misc/play_icon.png", "20px 8px 20px 14px").c_str());
     ui->stopButton->setStyleSheet(buttonStyle("255, 111, 96", ":/images/misc/stop_icon.png", "20px 10px 20px 10px").c_str());
     ui->progressBar->setStyleSheet(progressStyle);
@@ -71,6 +83,7 @@ MainWindow::MainWindow(QWidget*)
     ui->breakMinutes->setStyleSheet(inputStyle);
     ui->trayButton->setStyleSheet("QPushButton {background-color: rgb(40,40,40);}");
     ui->closeButton->setStyleSheet("background-color: rgb(112, 21, 21);");
+    ui->autostart->setStyleSheet(checkboxStyle);
 
     // apply shadow effect
     QGraphicsDropShadowEffect *shadowEffect = new QGraphicsDropShadowEffect;
@@ -120,14 +133,18 @@ MainWindow::MainWindow(QWidget*)
     connect(trayIcon.get(), SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(showHide(QSystemTrayIcon::ActivationReason)));
 
     trayQuitAction = std::unique_ptr<QAction>(new QAction("Quit",this)); // TODO: is context menu really needed?
-    connect(trayQuitAction.get(),SIGNAL(triggered()),this,SLOT(close()));
+    connect(trayQuitAction.get(), SIGNAL(triggered()), this, SLOT(close()));
     trayMenu->addAction(trayQuitAction.get());
 
     trayRestoreAction = std::unique_ptr<QAction>(new QAction("Restore",this));
-    connect(trayRestoreAction.get(),SIGNAL(triggered()),this,SLOT(showNormal()));
+    connect(trayRestoreAction.get(), SIGNAL(triggered()), this, SLOT(showNormal()));
     trayMenu->addAction(trayRestoreAction.get());
 
     trayIcon->show();
+
+    // handle autostart button
+    ui->autostart->setChecked(updateAutostartPath());
+    connect(ui->autostart, SIGNAL(stateChanged(int)), this, SLOT(checkboxStateChanged()));
 
     // handle start/stop timer
     connect(ui->startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
@@ -150,7 +167,13 @@ void MainWindow::showHide(QSystemTrayIcon::ActivationReason r)
             } else {
                 this->hide();
             }
-        }
+    }
+}
+
+void MainWindow::checkboxStateChanged()
+{
+    setAutostartEnabled(ui->autostart->isChecked());
+    qDebug() << "Autostart change result: " << isAutostartEnabled();
 }
 
 MainWindow::~MainWindow()

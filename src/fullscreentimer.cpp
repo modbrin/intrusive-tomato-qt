@@ -4,6 +4,7 @@
 
 #include <QPropertyAnimation>
 #include <QTimer>
+#include <QSound>
 
 FullscreenTimer::FullscreenTimer(int msec, int updateInterval, QWidget *parent) :
     TimerWindow(msec, updateInterval, parent),
@@ -67,6 +68,9 @@ void FullscreenTimer::timerFinished()
     // show confirmation button
     ui->confirmButton->setEnabled(true); // TODO: add animation
     ui->confirmButton->setVisible(true);
+
+    // notify user
+    QSound::play(":/sounds/misc/notification.wav");
 }
 
 void FullscreenTimer::breakFinishConfirmed()

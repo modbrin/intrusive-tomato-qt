@@ -6,4 +6,10 @@
 
 void enableWindowBackgroundBlur(QWidget* w);
 
+bool updateAutostartPath();
+
+void setAutostartEnabled(bool state);
+
+bool isAutostartEnabled();
+
 #endif // QTOMATO_UTILS_H

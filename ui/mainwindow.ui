@@ -26,7 +26,6 @@
       <widget class="QLabel" name="label">
        <property name="font">
         <font>
-         <family>Segoe MDL2 Assets</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -265,6 +264,18 @@
      </property>
      <property name="invertedAppearance">
       <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="autostart">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>start on boot</string>
      </property>
     </widget>
    </item>
