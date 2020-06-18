@@ -30,7 +30,6 @@ MainWindow::MainWindow(QWidget*)
     // window configs
     setWindowFlags(Qt::FramelessWindowHint);
     connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(close()));
-    connect(ui->trayButton, SIGNAL(clicked()), this, SLOT(hide()));
     ui->workMinutes->setFixedWidth(ui->workMinutes->width());
     ui->breakMinutes->setFixedWidth(ui->breakMinutes->width());
 
@@ -124,23 +123,30 @@ MainWindow::MainWindow(QWidget*)
     ui->progressBar->setTextVisible(false);
 
     // system tray icon
-    trayIcon = std::unique_ptr<QSystemTrayIcon>(new QSystemTrayIcon(this));
-    trayIcon->setIcon(QIcon(":/images/icon.ico"));
-    trayIcon->setToolTip("QTomato");
+    if (QSystemTrayIcon::isSystemTrayAvailable()) {
+        trayIcon = std::unique_ptr<QSystemTrayIcon>(new QSystemTrayIcon(this));
+        trayIcon->setIcon(QIcon(":/images/icon.ico"));
+        trayIcon->setToolTip("QTomato");
 
-    trayMenu = std::unique_ptr<QMenu>(new QMenu(this));
-    trayIcon->setContextMenu(trayMenu.get());
-    connect(trayIcon.get(), SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(showHide(QSystemTrayIcon::ActivationReason)));
+        trayMenu = std::unique_ptr<QMenu>(new QMenu(this));
+        trayIcon->setContextMenu(trayMenu.get());
+        connect(trayIcon.get(), SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(showHide(QSystemTrayIcon::ActivationReason)));
 
-    trayQuitAction = std::unique_ptr<QAction>(new QAction("Quit",this)); // TODO: is context menu really needed?
-    connect(trayQuitAction.get(), SIGNAL(triggered()), this, SLOT(close()));
-    trayMenu->addAction(trayQuitAction.get());
+        trayQuitAction = std::unique_ptr<QAction>(new QAction("Quit",this)); // TODO: is context menu really needed?
+        connect(trayQuitAction.get(), SIGNAL(triggered()), this, SLOT(close()));
+        trayMenu->addAction(trayQuitAction.get());
 
-    trayRestoreAction = std::unique_ptr<QAction>(new QAction("Restore",this));
-    connect(trayRestoreAction.get(), SIGNAL(triggered()), this, SLOT(showNormal()));
-    trayMenu->addAction(trayRestoreAction.get());
+        trayRestoreAction = std::unique_ptr<QAction>(new QAction("Restore",this));
+        connect(trayRestoreAction.get(), SIGNAL(triggered()), this, SLOT(showNormal()));
+        trayMenu->addAction(trayRestoreAction.get());
 
-    trayIcon->show();
+        trayIcon->show();
+        connect(ui->trayButton, SIGNAL(clicked()), this, SLOT(hide()));
+    } else {
+        ui->trayButton->setText("_");
+        ui->trayButton->setFixedWidth(ui->closeButton->width());
+        connect(ui->trayButton, SIGNAL(clicked()), this, SLOT(showMinimized()));
+    }
 
     // handle autostart button
     ui->autostart->setChecked(updateAutostartPath());
@@ -154,6 +160,12 @@ MainWindow::MainWindow(QWidget*)
     connect(this, SIGNAL(startWorkSession()), this, SLOT(launch()));
     connect(this, SIGNAL(finished()), this, SLOT(workSessionFinished()));
     connect(this, SIGNAL(stopRequested()), this, SLOT(stop()));
+
+    #ifdef Q_OS_LINUX
+    // set application icon in runtime
+    QIcon icon(":/images/icon.ico");
+    setWindowIcon(icon);
+    #endif
 
     adjustSize();
 }
