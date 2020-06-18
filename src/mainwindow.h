@@ -27,7 +27,6 @@ private: // containers
     int msecPrepare = 20'000; // 20 seconds default prepare timer
 
 private: // functions
-    void showMessage(const QString& msg);
     virtual void updateCountdownDisplay(int msec) override;
     virtual void fadeIn() override;
     virtual void fadeOut() override;

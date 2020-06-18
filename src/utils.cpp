@@ -1,5 +1,7 @@
 #include "utils.h"
 
+#include <QMessageBox>
+
 #ifdef Q_OS_WIN
 #include <windows.h>
 #include <WinUser.h>
@@ -32,7 +34,6 @@ void enableWindowBackgroundBlur(QWidget* w)
             setWindowCompositionAttribute(hwnd, &data);
         }
     }
-
     #endif // Q_OS_WIN
 }
 
@@ -43,15 +44,16 @@ static QString autostartKeyLocation("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Win
 // also update the path of startup - needed if app is moved, so restarting it will fix path
 bool updateAutostartPath() {
     if (isAutostartEnabled()) {
-        setAutostartEnabled(true);
-        return true;
+        return setAutostartEnabled(true);
     } else {
         return false;
     }
 }
 
-void setAutostartEnabled(bool state)
+// returns success status
+bool setAutostartEnabled(bool state)
 {
+    #ifdef Q_OS_WIN
     QSettings bootUpSettings(
         autostartKeyLocation,
         QSettings::NativeFormat
@@ -64,12 +66,25 @@ void setAutostartEnabled(bool state)
     } else {
         bootUpSettings.remove(launchKey);
     }
+    #else
+    return !state;
+    #endif
 }
 
 bool isAutostartEnabled() {
+    #ifdef Q_OS_WIN
     QSettings settings (
         autostartKeyLocation,
         QSettings::NativeFormat
     );
     return settings.childKeys().contains(launchKey, Qt::CaseInsensitive);
+    #else
+    return false;
+    #endif // Q_OS_WIN
+}
+
+void showMessage(const QString& msg) {
+    QMessageBox mb;
+    mb.setText(msg);
+    mb.exec();
 }

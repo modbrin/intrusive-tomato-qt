@@ -172,7 +172,11 @@ void MainWindow::showHide(QSystemTrayIcon::ActivationReason r)
 
 void MainWindow::checkboxStateChanged()
 {
-    setAutostartEnabled(ui->autostart->isChecked());
+    auto success = setAutostartEnabled(ui->autostart->isChecked());
+    if (!success) { // uncheck if operation was not successful
+        showMessage("Autostart is not implemented for this platform.");
+        ui->autostart->setChecked(false);
+    }
     qDebug() << "Autostart change result: " << isAutostartEnabled();
 }
 
@@ -190,11 +194,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
     move(event->globalX() - m_nMouseClick_X_Coordinate, event->globalY() - m_nMouseClick_Y_Coordinate);
 }
 
-void MainWindow::showMessage(const QString& msg) {
-    QMessageBox mb;
-    mb.setText(msg);
-    mb.exec();
-}
+
 
 void MainWindow::updateCountdownDisplay(int msec)
 {

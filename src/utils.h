@@ -8,8 +8,10 @@ void enableWindowBackgroundBlur(QWidget* w);
 
 bool updateAutostartPath();
 
-void setAutostartEnabled(bool state);
+bool setAutostartEnabled(bool state);
 
 bool isAutostartEnabled();
+
+void showMessage(const QString& msg);
 
 #endif // QTOMATO_UTILS_H
