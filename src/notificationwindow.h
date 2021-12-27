@@ -16,7 +16,7 @@ class NotificationWindow : public TimerWindow
     Q_OBJECT
 
 public:
-    explicit NotificationWindow(QString message, int msec, int updateInterval = 200, QWidget *parent = nullptr);
+    NotificationWindow(QString message, int msec, int updateInterval = 200, QWidget *parent = nullptr);
     ~NotificationWindow();
 
 

@@ -9,12 +9,14 @@
 #include <QMessageBox>
 #include <QFontDatabase>
 #include <QGraphicsOpacityEffect>
-#include <QSound>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include <QSettings>
 #include "notificationwindow.h"
 #include "fullscreentimer.h"
 #include "utils.h"
 #include <sstream>
+#include <QSoundEffect>
 
 
 MainWindow::MainWindow(QWidget*)
@@ -90,7 +92,6 @@ MainWindow::MainWindow(QWidget*)
     shadowEffect->setXOffset(0);
     shadowEffect->setYOffset(5);
     shadowEffect->setBlurRadius(15);
-
     ui->startButton->setGraphicsEffect(shadowEffect);
     ui->stopButton->setGraphicsEffect(shadowEffect);
     ui->workMinutes->setGraphicsEffect(shadowEffect);
@@ -124,19 +125,19 @@ MainWindow::MainWindow(QWidget*)
 
     // system tray icon
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
-        trayIcon = std::unique_ptr<QSystemTrayIcon>(new QSystemTrayIcon(this));
+        trayIcon = std::make_unique<QSystemTrayIcon>(this);
         trayIcon->setIcon(QIcon(":/images/icon.ico"));
         trayIcon->setToolTip("QTomato");
 
-        trayMenu = std::unique_ptr<QMenu>(new QMenu(this));
+        trayMenu = std::make_unique<QMenu>(this);
         trayIcon->setContextMenu(trayMenu.get());
         connect(trayIcon.get(), SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(showHide(QSystemTrayIcon::ActivationReason)));
 
-        trayQuitAction = std::unique_ptr<QAction>(new QAction("Quit",this)); // TODO: is context menu really needed?
+        trayQuitAction = std::make_unique<QAction>("Quit",this); // TODO: is context menu really needed?
         connect(trayQuitAction.get(), SIGNAL(triggered()), this, SLOT(close()));
         trayMenu->addAction(trayQuitAction.get());
 
-        trayRestoreAction = std::unique_ptr<QAction>(new QAction("Restore",this));
+        trayRestoreAction = std::make_unique<QAction>("Restore",this);
         connect(trayRestoreAction.get(), SIGNAL(triggered()), this, SLOT(showNormal()));
         trayMenu->addAction(trayRestoreAction.get());
 
@@ -160,6 +161,11 @@ MainWindow::MainWindow(QWidget*)
     connect(this, SIGNAL(startWorkSession()), this, SLOT(launch()));
     connect(this, SIGNAL(finished()), this, SLOT(workSessionFinished()));
     connect(this, SIGNAL(stopRequested()), this, SLOT(stop()));
+
+    // init media player
+    m_player = new QMediaPlayer(this);
+    m_audioOutput = new QAudioOutput(this);
+    m_player->setAudioOutput(m_audioOutput);
 
     #ifdef Q_OS_LINUX
     // set application icon in runtime
@@ -198,12 +204,12 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {
-    m_nMouseClick_X_Coordinate = event->x();
-    m_nMouseClick_Y_Coordinate = event->y();
+    m_nMouseClick_X_Coordinate = event->position().x();
+    m_nMouseClick_Y_Coordinate = event->position().y();
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event) {
-    move(event->globalX() - m_nMouseClick_X_Coordinate, event->globalY() - m_nMouseClick_Y_Coordinate);
+    move(event->globalPosition().x() - m_nMouseClick_X_Coordinate, event->globalPosition().y() - m_nMouseClick_Y_Coordinate);
 }
 
 
@@ -320,7 +326,9 @@ void MainWindow::workSessionFinished()
 
     ui->progressBar->setValue(0);
 
-    QSound::play(":/sounds/misc/notification.wav");
+    // sound effect
+    m_player->setSource(QUrl("qrc:/sounds/misc/notification.wav"));
+    m_player->play();
 
     emit startPreparationTimer();
 }
@@ -335,7 +343,9 @@ void MainWindow::preparationTimerFinished()
     connect(this, SIGNAL(stopRequested()), win, SLOT(stop()));
     win->show();
 
-    QSound::play(":/sounds/misc/drip.wav");
+    // sound effect
+    m_player->setSource(QUrl("qrc:/sounds/misc/drip.wav"));
+    m_player->play();
 
     emit startBreakSession();
 }

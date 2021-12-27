@@ -11,8 +11,8 @@ class TimerWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit TimerWindow(int updateInterval = 200, QWidget *parent = nullptr);
-    explicit TimerWindow(int msec, int updateInterval = 200, QWidget *parent = nullptr);
+    TimerWindow(int updateInterval = 200, QWidget *parent = nullptr);
+    TimerWindow(int msec, int updateInterval = 200, QWidget *parent = nullptr);
     void setDuration(int msec);
     void setUpdateInterval(int msec);
     ~TimerWindow();
@@ -30,7 +30,7 @@ protected: // functions
     virtual void updateCountdownDisplay(int msec) = 0;
 
 private:
-    QPropertyAnimation* makeFadeOutAnimation();
+    std::unique_ptr<QPropertyAnimation> makeFadeOutAnimation();
 
 public slots:
     void launch(); // fade in and start countdown

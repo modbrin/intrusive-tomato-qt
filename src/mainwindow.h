@@ -5,7 +5,8 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QIcon>
-
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include "timerwindow.h"
 
 QT_BEGIN_NAMESPACE
@@ -22,6 +23,8 @@ public:
 
 private: // containers
     Ui::MainWindow *ui;
+    QMediaPlayer* m_player;
+    QAudioOutput* m_audioOutput;
     int msecWork = 15'000; // 1 minute default work session
     int msecBreak = 15'000; // 1 minutes default work session
     int msecPrepare = 20'000; // 20 seconds default prepare timer

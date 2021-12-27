@@ -51,7 +51,7 @@ bool updateAutostartPath() {
 }
 
 // returns success status
-bool setAutostartEnabled(bool state)
+bool setAutostartEnabled(bool isEnabled)
 {
     #ifdef Q_OS_WIN
     QSettings bootUpSettings(
@@ -61,13 +61,14 @@ bool setAutostartEnabled(bool state)
     QString apostroph = "\"";
     QString app_path = apostroph + QCoreApplication::applicationFilePath() + apostroph;
     app_path.replace("/", "\\");
-    if (state) {
+    if (isEnabled) {
         bootUpSettings.setValue(launchKey, app_path);
     } else {
         bootUpSettings.remove(launchKey);
     }
+    return isEnabled == isAutostartEnabled();
     #else
-    return !state;
+    return false;
     #endif
 }
 

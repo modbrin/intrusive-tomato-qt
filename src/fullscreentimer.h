@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QTimer>
 #include <QTime>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include "timerwindow.h"
 
 namespace Ui {
@@ -15,7 +17,7 @@ class FullscreenTimer : public TimerWindow
     Q_OBJECT
 
 public:
-    explicit FullscreenTimer(int msec, int updateInterval = 200, QWidget *parent = nullptr);
+    FullscreenTimer(int msec, int updateInterval = 200, QWidget *parent = nullptr);
     ~FullscreenTimer();
 
 private: // functions
@@ -24,6 +26,8 @@ private: // functions
 
 private: // containers
     Ui::FullscreenTimer *ui;
+    QMediaPlayer* m_player;
+    QAudioOutput* m_audioOutput;
 
 private slots:
     void breakFinishConfirmed();

@@ -4,7 +4,8 @@
 
 #include <QPropertyAnimation>
 #include <QTimer>
-#include <QSound>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 FullscreenTimer::FullscreenTimer(int msec, int updateInterval, QWidget *parent) :
     TimerWindow(msec, updateInterval, parent),
@@ -39,6 +40,11 @@ FullscreenTimer::FullscreenTimer(int msec, int updateInterval, QWidget *parent) 
         et->setEnabled(false);
     };
 
+    // init media player
+    m_player = new QMediaPlayer(this);
+    m_audioOutput = new QAudioOutput(this);
+    m_player->setAudioOutput(m_audioOutput);
+
     setupTextStyle(ui->timeField);
     updateCountdownDisplay(msec);
 }
@@ -69,8 +75,9 @@ void FullscreenTimer::timerFinished()
     ui->confirmButton->setEnabled(true); // TODO: add animation
     ui->confirmButton->setVisible(true);
 
-    // notify user
-    QSound::play(":/sounds/misc/notification.wav");
+    // sound effect
+    m_player->setSource(QUrl("qrc:/sounds/misc/notification.wav"));
+    m_player->play();
 }
 
 void FullscreenTimer::breakFinishConfirmed()

@@ -48,24 +48,24 @@ void TimerWindow::fadeIn()
     anim->setDuration(700);
     anim->setStartValue(0);
     anim->setEndValue(1);
-    anim->setEasingCurve(QEasingCurve::InBack);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
     anim->start(QPropertyAnimation::DeleteWhenStopped);
 
 }
 
-QPropertyAnimation* TimerWindow::makeFadeOutAnimation()
+std::unique_ptr<QPropertyAnimation> TimerWindow::makeFadeOutAnimation()
 {
-    QPropertyAnimation *anim = new QPropertyAnimation(this, "windowOpacity");
+    std::unique_ptr<QPropertyAnimation> anim = std::make_unique<QPropertyAnimation>(this, "windowOpacity");
     anim->setDuration(500);
     anim->setStartValue(1);
     anim->setEndValue(0);
-    anim->setEasingCurve(QEasingCurve::OutBack);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
     return anim;
 }
 
 void TimerWindow::fadeOut()
 {
-    auto anim = makeFadeOutAnimation();
+    QPropertyAnimation* anim = makeFadeOutAnimation().release();
     connect(anim, SIGNAL(finished()), this, SLOT(countdownFinished()));
     connect(anim, SIGNAL(finished()), this, SLOT(close()));
     anim->start(QPropertyAnimation::DeleteWhenStopped);
@@ -73,8 +73,8 @@ void TimerWindow::fadeOut()
 
 void TimerWindow::fadeOutNoFinished()
 {
-    auto anim = makeFadeOutAnimation();
-    connect(anim, SIGNAL(finished()), this, SLOT(close()));
+    std::unique_ptr<QPropertyAnimation> anim = makeFadeOutAnimation();
+    connect(anim.release(), SIGNAL(finished()), this, SLOT(close()));
     anim->start(QPropertyAnimation::DeleteWhenStopped);
 }
 
@@ -110,4 +110,5 @@ void TimerWindow::timerFinished()
 
 TimerWindow::~TimerWindow()
 {
+    // empty
 }
